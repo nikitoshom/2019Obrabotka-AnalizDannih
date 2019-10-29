@@ -21,4 +21,22 @@ for rate in rates:
     images[rate] = image
     to_img = tf.keras.preprocessing.image.array_to_img(image)
     to_img.show()
-
+'''
+downsampled_im = tf.io.decode_jpeg(tf.reshape(img, []))[..., :3]
+original_im = tf.io.decode_jpeg(img)#[..., :3]
+size = original_im.shape[0:2]
+psnr1 = tf.image.psnr(images_resized[0], img, max_val=255)
+resized = tf.image.resize(
+        downsampled_im,
+        size,
+        method=tf.image.ResizeMethod.NEAREST_NEIGHBOR,
+        preserve_aspect_ratio=False,
+        antialias=False,
+        name=None
+    )
+psnr_value = tf.image.psnr(
+        original_im,
+        resized,
+        max_val=255,
+        name=None)
+'''
