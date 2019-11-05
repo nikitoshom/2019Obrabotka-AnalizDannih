@@ -3,8 +3,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import numpy as np
 import cv2
+import pandas as pd
 import os
 import glob
+#from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     #path = '/Users/nikitaskuratovich/Downloads/Images/Trees.jpg'
@@ -25,104 +30,58 @@ if __name__ == '__main__':
 
     # resize images
     rates = (2, 4, 8, 16, 32)
-    original_images=[]
-    img = []
-    images_resized = []
+    #original_images=[]
+    #images_resized = []
     images_after_resized_with_original_size = []
-    number_image = 0
+
+
+
+    #resized images
     for number_image in range(len(uploadImages)):
         img = tf.keras.preprocessing.image.load_img(uploadImages[number_image])
         img = tf.convert_to_tensor(np.asarray(img))
-        original_images.append(img)
+        images_after_resized_with_original_size.append(img)
         for rate in rates:
             size = img.shape
             number = 0
             X = int(size[0] / rate)
             Y = int(size[1] / rate)
             # print(X,'  ',Y) #checking result
-            image = tf.image.resize(img, (X, Y))
+            img_res = tf.image.resize(img, (X, Y))
             # print(image.shape) #checking result
-            images_resized.append(image)  # add new risized image
-            image_original_size = tf.image.resize(image, (size[0], size[1]),method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-            images_after_resized_with_original_size.append(image_original_size)
-            number = number + 1
-
-            to_img = tf.keras.preprocessing.image.array_to_img(image_original_size)  # array to image
+            #images_resized.append(img_res)  # add new risized image
+            img_res = tf.image.resize(img_res, (size[0], size[1]),method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+            img_res = tf.keras.preprocessing.image.array_to_img(img_res)
+            # to_img.show()
+            img_res = np.asanyarray(img_res)
+            # to_img.show()
+            images_after_resized_with_original_size.append(img_res)
+            #number = number + 1
+            #to_img = tf.keras.preprocessing.image.array_to_img(image_original_size)  # array to image
             #to_img.show() #checking result
-    print(len(images_after_resized_with_original_size))
+    #print(len(images_after_resized_with_original_size))
 
-    to_img = tf.keras.preprocessing.image.array_to_img(images_after_resized_with_original_size[4])
-    to_img.show()
-    for i in range(0,5):
-        # image = np.asanyarray(image)
+    psnr1 = []
+    for i in range(1, 6):
+        psnrNew = tf.image.psnr(images_after_resized_with_original_size[0],images_after_resized_with_original_size[i], max_val=255)
+        # psnr1.append(psnrNew)
+        psnr1.append(psnrNew.numpy())
+    # ImagesNewSize[4].show()
+    # image = np.asanyarray(image)
+    print(psnr1)
 
-        psnr1 = tf.image.psnr(np.asarray(original_images[0]), np.asarray(images_after_resized_with_original_size[i]), max_val=255)
-        print(psnr1)
+    decrease2 = [2, 4, 8, 16, 32]
+    aswdw = [decrease2, psnr1]
+    print(aswdw)
 
+    data = {'Name': psnr1,
+            'Age': decrease2}
 
-    '''
-    print(len(images_resized))
-    # decode to image with using methode nearest neighbor
-    size = img.shape
-    resized = tf.image.resize(
-        images_resized[1],
-        size,
-        method=tf.image.ResizeMethod.NEAREST_NEIGHBOR,
-        preserve_aspect_ratio=False,
-        antialias=False,
-        name=None
-    )
-    '''
+    df = pd.DataFrame(data)
+    print(df)
 
-    '''
-    psnr_value = tf.image.psnr(
-        original_im,
-        resized,
-        max_val=255,
-        name=None)
-    '''
-
-# to_img.show() #checking result
-#list of resized images
-#print(size) #checking result
-#print(size[0], size[1]) #checking result
+    plt.boxplot(df)
+    plt.show()
 
 
 
-
-
-    #to_img2 = tf.io.encode_jpeg(image,size[0],size[1])
-
-    # Read images from file.
-    #im1 = tf.decode_png('path/to/im1.png')
-    #im2 = tf.decode_png('path/to/im2.png')
-    # Compute PSNR over tf.uint8 Tensors.
-    #downsampled_im = tf.io.decode_jpeg(tf.reshape(img, []))[..., :3]
-
-
-    '''
-    original_im = tf.io.decode_jpeg(img)#[..., :3]
-    size = original_im.shape[0:2]
-    psnr1 = tf.image.psnr(images_resized[0], img, max_val=255)
-    resized = tf.image.resize(
-            downsampled_im,
-            size,
-            method=tf.image.ResizeMethod.NEAREST_NEIGHBOR,
-            preserve_aspect_ratio=False,
-            antialias=False,
-            name=None
-        )
-    psnr_value = tf.image.psnr(
-            original_im,
-            resized,
-            max_val=255,
-            name=None)
-            '''
-
-    '''
-    # Compute PSNR over tf.float32 Tensors.
-    im1 = tf.image.convert_image_dtype(im1, tf.float32)
-    im2 = tf.image.convert_image_dtype(im2, tf.float32)
-    psnr2 = tf.image.psnr(im1, im2, max_val=1.0)
-    # psnr1 and psnr2 both have type tf.float32 and are almost equal.
-    '''
