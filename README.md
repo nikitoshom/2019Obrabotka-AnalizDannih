@@ -5,4 +5,4 @@
 3. вычислены пиковые отношения сигнала к шуму изображения и построен график: 
   
 
-!['boxplot'](https://github.com/nikitoshom/2019Obrabotka-AnalizDannih/master/Plot1(PSNR-rate).png)
+!['boxplot'](https://github.com/nikitoshom/2019Obrabotka-AnalizDannih/blob/master/Plot1(PSNR-rate).png)
